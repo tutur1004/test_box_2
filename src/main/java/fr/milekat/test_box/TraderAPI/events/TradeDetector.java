@@ -33,33 +33,33 @@ public class TradeDetector implements Listener {
             if (event.getRawSlot() == -999) return;
             TraderTrade trade = inventory.getTrades().get(((MerchantInventory)
                     event.getWhoClicked().getOpenInventory().getTopInventory()).getSelectedRecipeIndex());
-            int tradescount = 1;
+            int trade_count = 1;
             if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 // This situation is where the player SHIFT+CLICKS the output item to buy multiple times at once.
                 ItemStack itemOne = this.inventory.getForWho().getOpenInventory().getTopInventory().getItem(0);
                 ItemStack itemTwo = this.inventory.getForWho().getOpenInventory().getTopInventory().getItem(1);
                 ItemStack result = event.getCurrentItem();
-                int cantrade;
+                int can_trade;
                 /* 1 - Get how many the player can trade with his items */
                 if (itemOne == null || result==null) return;
-                cantrade = (int) Math.floor((double) itemOne.getAmount() / (double) trade.getItemOne().getAmount());
+                can_trade = (int) Math.floor((double) itemOne.getAmount() / (double) trade.getItemOne().getAmount());
                 if (itemTwo != null) {
-                    cantrade = Math.min(cantrade,
+                    can_trade = Math.min(can_trade,
                             (int) Math.floor((double) itemTwo.getAmount() / (double) trade.getItemTwo().getAmount()));
                 }
                 /* 2 - Check max stack size of result */
-                cantrade = Math.min(cantrade, result.getMaxStackSize());
-                Bukkit.getLogger().info(String.valueOf(cantrade));
+                can_trade = Math.min(can_trade, result.getMaxStackSize());
+                Bukkit.getLogger().info(String.valueOf(can_trade));
                 /* 3 - Get how many times the player can store the trade result in his inventory */
-                for (int i=1; i <= cantrade; i++) {
-                    Bukkit.getLogger().info(String.valueOf(tradescount));
+                for (int i=1; i <= can_trade; i++) {
+                    Bukkit.getLogger().info(String.valueOf(trade_count));
                     if (canStore(event.getWhoClicked().getInventory(), result, i)) {
-                        tradescount = i;
+                        trade_count = i;
                     } else break;
                 }
             }
             if (event.getRawSlot() == 2 && !Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.AIR)) {
-                TradeComplete tradeCompleteEvent = new TradeComplete(inventory, (Player) event.getWhoClicked(), trade, tradescount);
+                TradeComplete tradeCompleteEvent = new TradeComplete(inventory, (Player) event.getWhoClicked(), trade, trade_count);
                 Bukkit.getPluginManager().callEvent(tradeCompleteEvent);
                 if (tradeCompleteEvent.isCancelled()) event.setCancelled(true);
             }

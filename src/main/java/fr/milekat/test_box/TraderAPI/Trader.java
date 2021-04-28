@@ -2,7 +2,7 @@ package fr.milekat.test_box.TraderAPI;
 
 import fr.milekat.test_box.TraderAPI.classes.TraderInventory;
 import fr.milekat.test_box.TraderAPI.events.TradeDetector;
-import org.bukkit.Bukkit;
+import fr.milekat.test_box.Utils.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Merchant;
 
@@ -15,11 +15,11 @@ public class Trader {
     private final TraderInventory inventory;
     private final Class<?> nms_merchant;
 
-    public Trader(Player player) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public Trader(Player player) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         inventory = new TraderInventory(null, player, new ArrayList<>(), 0);
-        Constructor<?> craftMerchantCustom = TraderUtils.getNMSRecipes(inventory).getClass().getConstructor(String.class);
+        Constructor<?> craftMerchantCustom = NMSUtils.getNMSCraftBukkit("CraftMerchantCustom").getConstructor(String.class);
         this.nms_merchant = (Class<?>) craftMerchantCustom.newInstance(inventory.getName());
-        this.nms_merchant.getDeclaredMethod("setRecipes", TraderUtils.getNMSRecipes(inventory).getClass());
+        this.nms_merchant.getDeclaredMethod("setRecipes", NMSUtils.getNMSRecipes(inventory).getClass());
         new TradeDetector(inventory);
     }
 
@@ -29,11 +29,5 @@ public class Trader {
 
     public void open() {
         inventory.getForWho().openMerchant((Merchant) nms_merchant.getClassLoader(), true);
-    }
-
-    private Class<?> getNMSCraftBukkit(String name) throws ClassNotFoundException {
-        return Class.forName("org.bukkit.craftbukkit." +
-                Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + "." +
-                "CraftMerchantCustom" + name);
     }
 }
