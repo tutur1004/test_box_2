@@ -1,0 +1,5 @@
+name: TestBox
+main: fr.milekat.test_box.Main
+version: 1.0
+authors: [MileKat]
+api-version: 1.16
